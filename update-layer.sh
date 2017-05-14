@@ -3,7 +3,17 @@
 set -e
 
 list_layers() {
-	git config --name-only --get-regexp 'layer\.[^.]*\.url' | sed -e 's/^layer\.//' -e 's/\.url$//'
+	git config --name-only --get-regexp 'layer\.[^.]*\.url' |
+	sed -e 's/^layer\.//' -e 's/\.url$//' |
+	{
+		while read layer; do
+			if [ $(git config --get layer.$layer.skip) ]; then
+				echo >&2 "[$layer] Skipping"
+				continue
+			fi
+			echo "$layer"
+		done
+	}
 }
 
 update_all_sources() {
@@ -17,10 +27,6 @@ update_all_sources() {
 
 update_source() {
 	layer=$1
-	if [ $(git config --get layer.$layer.skip) ]; then
-		echo "[$layer] Skipping"
-		continue
-	fi
 	url=$(git config --get layer.$layer.url)
 	branch=$(git config --get layer.$layer.branch)
 	echo "[$layer] fetching $url $branch"
