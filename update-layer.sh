@@ -62,18 +62,18 @@ transform_branch() {
 		return
 	fi
 	backup
-	git filter-branch -f --index-filter '
+	git filter-branch -f --index-filter "
 		git ls-files -s |
 		{
-			while read; do
-				echo "${REPLY/	/	$mountpoint}"
+			while read line; do
+				echo \"\${line/	/	$mountpoint/}\"
 			done
 		} |
-		GIT_INDEX_FILE=$GIT_INDEX_FILE.new git update-index --index-info &&
-		if test -f "$GIT_INDEX_FILE.new"; then
-			mv $GIT_INDEX_FILE.new $GIT_INDEX_FILE;
+		GIT_INDEX_FILE=\$GIT_INDEX_FILE.new git update-index --index-info &&
+		if test -f \"\$GIT_INDEX_FILE.new\"; then
+			mv \$GIT_INDEX_FILE.new \$GIT_INDEX_FILE;
 		fi
-	' $branch
+	" $branch
 	restore
 }
 
