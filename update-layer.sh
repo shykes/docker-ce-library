@@ -51,6 +51,7 @@ update_cache() {
 	git branch $tmp $src
 	mountpoint=$(git config --get layer.$layer.mountpoint)
 	transform_branch $tmp $mountpoint
+	echo "[$layer] moving $tmp to $cache"
 	git branch -m -f $tmp $cache
 }
 
